@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -27,20 +26,17 @@ export default function TraineesPage() {
 
   useEffect(() => {
     async function fetchTrainees() {
+      // TEMP: remove role filter for debugging
       const { data, error } = await supabase
         .from("profiles")
         .select(
           "id,name,main_field,profile_image,city,country,bio,social_profile,role"
-        )
-        .eq("role", "trainee");
-
-      console.log("Supabase: fetched trainee profiles", { data, error });
-
+        );
+      console.log("Supabase: fetched ALL profiles for debug", { data, error });
       if (!data || error) {
         setTrainees([]);
         return;
       }
-
       // Extract skills_learning from social_profile
       const traineesWithSkills: TraineeProfile[] = data.map((row: any) => ({
         ...row,
@@ -49,7 +45,6 @@ export default function TraineesPage() {
           row.social_profile?.skills ||
           (row.main_field ? [row.main_field] : []),
       }));
-
       setTrainees(traineesWithSkills);
 
       // Gather unique skill list
