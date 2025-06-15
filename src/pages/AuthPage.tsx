@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+const ROLES = [
+  { value: "trainee", label: "Trainee" },
+  { value: "expert", label: "Expert" },
+  { value: "company", label: "Company" },
+];
+
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -17,6 +24,7 @@ export default function AuthPage() {
   const [name, setName] = useState("");
   const [country, setCountry] = useState("");
   const [bio, setBio] = useState("");
+  const [role, setRole] = useState("trainee");
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -44,6 +52,7 @@ export default function AuthPage() {
     setName("");
     setCountry("");
     setBio("");
+    setRole("trainee");
     setErrorMsg("");
   };
 
@@ -59,6 +68,16 @@ export default function AuthPage() {
       // Simple client validation
       if (!name.trim()) {
         setErrorMsg("Please enter your name.");
+        setLoading(false);
+        return;
+      }
+      if (
+        name
+          .trim()
+          .toLowerCase()
+          .includes("@")
+      ) {
+        setErrorMsg("Name cannot be an email address.");
         setLoading(false);
         return;
       }
@@ -80,12 +99,15 @@ export default function AuthPage() {
         setErrorMsg(error.message);
       } else if (data?.user) {
         // Update profile after user created (wait for session to exist)
-        await supabase.from("profiles").update({
-          name,
-          country: country || null,
-          bio: bio || null,
-        })
-        .eq("id", data.user.id);
+        await supabase
+          .from("profiles")
+          .update({
+            name,
+            country: country || null,
+            bio: bio || null,
+            role,
+          })
+          .eq("id", data.user.id);
       }
     }
     setLoading(false);
@@ -118,7 +140,7 @@ export default function AuthPage() {
                   placeholder={t("your_full_name")}
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  />
+                />
               </div>
               <div>
                 <Label htmlFor="country">{t("country")}</Label>
@@ -127,11 +149,12 @@ export default function AuthPage() {
                   placeholder={t("country")}
                   value={country}
                   onChange={e => setCountry(e.target.value)}
-                  />
+                />
               </div>
               <div>
                 <Label htmlFor="bio">
-                  {t("bio")} <span className="text-xs text-muted-foreground">{t("max_chars", { count: 200 })}</span>
+                  {t("bio")}{" "}
+                  <span className="text-xs text-muted-foreground">{t("max_chars", { count: 200 })}</span>
                 </Label>
                 <Textarea
                   id="bio"
@@ -139,7 +162,23 @@ export default function AuthPage() {
                   maxLength={200}
                   value={bio}
                   onChange={e => setBio(e.target.value)}
-                  />
+                />
+              </div>
+              <div>
+                <Label htmlFor="role">Account Type</Label>
+                <select
+                  id="role"
+                  required
+                  value={role}
+                  onChange={e => setRole(e.target.value)}
+                  className="w-full border rounded px-3 py-2"
+                >
+                  {ROLES.map(r => (
+                    <option key={r.value} value={r.value}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
@@ -183,9 +222,7 @@ export default function AuthPage() {
             resetFields();
           }}
         >
-          {isLogin
-            ? t("dont_have_account")
-            : t("already_have_account")}
+          {isLogin ? t("dont_have_account") : t("already_have_account")}
         </button>
       </div>
     </div>
