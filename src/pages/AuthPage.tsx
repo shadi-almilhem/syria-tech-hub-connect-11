@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft } from "lucide-react";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -91,7 +91,17 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-background">
+    <div className="min-h-screen flex justify-center items-center bg-background relative">
+      {/* Back button */}
+      <button
+        onClick={() => navigate("/")}
+        className="absolute left-4 top-4 flex items-center gap-2 text-gray-600 hover:text-primary px-3 py-2 rounded transition bg-white/80"
+        aria-label="Back to Home"
+        type="button"
+      >
+        <ArrowLeft size={20} />
+        <span className="hidden sm:inline font-medium">Back</span>
+      </button>
       <div className="max-w-md w-full bg-white rounded-xl shadow-md p-8 border flex flex-col gap-6">
         <h1 className="text-2xl font-bold text-primary mb-2 text-center">
           {isLogin ? "Login" : "Sign up"}
