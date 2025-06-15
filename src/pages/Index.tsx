@@ -10,11 +10,10 @@ import { useState } from "react";
 
 // TEMP: simulate simple role logic, in prod connect to Supabase Auth + roles
 export default function Index() {
-  const [role, setRole] = useState("Visitor");
-
+  // Removed role, setRole since we no longer need them
   return (
     <div className="min-h-screen flex flex-col font-sans bg-background">
-      <NavBar currentRole={role} onRoleChange={setRole} />
+      <NavBar />
       <main className="flex-grow w-full">
         <HeroSection />
         <FeaturedJobs />
