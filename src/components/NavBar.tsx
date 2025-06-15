@@ -1,14 +1,7 @@
 
-import { LogIn, User, Users, Briefcase, Star, Building2 } from "lucide-react";
+import { LogIn } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { Link } from "react-router-dom";
-
-const roles = [
-  { name: "Visitor", icon: User },
-  { name: "Expert", icon: Star },
-  { name: "Trainee", icon: Users },
-  { name: "Company", icon: Briefcase },
-];
 
 const pages = [
   { name: "Experts", path: "/experts" },
@@ -16,13 +9,7 @@ const pages = [
   { name: "Companies", path: "/companies" },
 ];
 
-export default function NavBar({
-  currentRole = "Visitor",
-  onRoleChange,
-}: {
-  currentRole?: string;
-  onRoleChange?: (role: string) => void;
-}) {
+export default function NavBar() {
   return (
     <header className="w-full bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-40 border-b border-gray-100">
       <nav className="container max-w-screen-2xl mx-auto px-4 flex items-center justify-between h-20">
@@ -30,23 +17,6 @@ export default function NavBar({
           <img src="/logo.svg" alt="Syrian Tech Club" className="w-8 h-8 rounded-lg" />
           Syrian Tech Club
         </a>
-        <ul className="flex items-center gap-1">
-          {roles.map((role) => (
-            <li key={role.name}>
-              <button
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-md font-medium transition-colors
-                  ${currentRole === role.name
-                  ? "bg-primary text-white shadow"
-                  : "hover:bg-gray-100 text-gray-700"}
-                `}
-                onClick={() => onRoleChange?.(role.name)}
-              >
-                <role.icon size={18} />
-                <span className="hidden md:inline">{role.name}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
         <ul className="flex items-center gap-2 ml-4">
           {pages.map((page) => (
             <li key={page.name}>
@@ -73,4 +43,3 @@ export default function NavBar({
     </header>
   );
 }
-
