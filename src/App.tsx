@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
+import ExpertsPage from "./pages/ExpertsPage";
+import TraineesPage from "./pages/TraineesPage";
+import CompaniesPage from "./pages/CompaniesPage";
 import { supabase } from "@/integrations/supabase/client";
 
 // Helper component to protect routes that require authentication
@@ -58,10 +61,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
-          <Route
-            path="/"
-            element={<Index />}
-          />
+          <Route path="/" element={<Index />} />
+          <Route path="/experts" element={<ExpertsPage />} />
+          <Route path="/trainees" element={<TraineesPage />} />
+          <Route path="/companies" element={<CompaniesPage />} />
           {/* Future: Protect private routes with PrivateRoute if needed */}
           <Route path="*" element={<NotFound />} />
         </Routes>

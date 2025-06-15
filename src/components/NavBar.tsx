@@ -1,5 +1,5 @@
 
-import { LogIn, User, Users, Briefcase, Star } from "lucide-react";
+import { LogIn, User, Users, Briefcase, Star, Building2 } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { Link } from "react-router-dom";
 
@@ -8,6 +8,12 @@ const roles = [
   { name: "Expert", icon: Star },
   { name: "Trainee", icon: Users },
   { name: "Company", icon: Briefcase },
+];
+
+const pages = [
+  { name: "Experts", path: "/experts" },
+  { name: "Trainees", path: "/trainees" },
+  { name: "Companies", path: "/companies" },
 ];
 
 export default function NavBar({
@@ -41,6 +47,18 @@ export default function NavBar({
             </li>
           ))}
         </ul>
+        <ul className="flex items-center gap-2 ml-4">
+          {pages.map((page) => (
+            <li key={page.name}>
+              <Link
+                to={page.path}
+                className="font-semibold px-3 py-1.5 text-primary rounded-md hover:bg-primary hover:text-white transition"
+              >
+                {page.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
           <Link
@@ -55,3 +73,4 @@ export default function NavBar({
     </header>
   );
 }
+
