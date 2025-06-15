@@ -30,11 +30,16 @@ export default function TraineesPage() {
       const { data, error } = await supabase
         .from("profiles")
         .select(
-          "id,name,main_field,profile_image,city,country,bio,social_profile"
+          "id,name,main_field,profile_image,city,country,bio,social_profile,role"
         )
         .eq("role", "trainee");
 
-      if (!data || error) return setTrainees([]);
+      console.log("Supabase: fetched trainee profiles", { data, error });
+
+      if (!data || error) {
+        setTrainees([]);
+        return;
+      }
 
       // Extract skills_learning from social_profile
       const traineesWithSkills: TraineeProfile[] = data.map((row: any) => ({
