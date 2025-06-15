@@ -1,12 +1,18 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import Modal from "./Modal";
 import EditProfileForm from "./EditProfileForm";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft } from "lucide-react";
 
-export default function UserProfile({ onClose }: { onClose?: () => void }) {
+export default function UserProfile({
+  onClose,
+  pageView,
+}: {
+  onClose?: () => void;
+  pageView?: boolean;
+}) {
   const [profile, setProfile] = useState<any>(null);
   const [editOpen, setEditOpen] = useState(false);
   const { toast } = useToast();
@@ -15,9 +21,17 @@ export default function UserProfile({ onClose }: { onClose?: () => void }) {
     const getProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return;
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", session.user.id).single();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
       if (error) {
-        toast({ title: "Error", description: error.message, variant: "destructive" });
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
       } else {
         setProfile(data);
       }
@@ -30,43 +44,77 @@ export default function UserProfile({ onClose }: { onClose?: () => void }) {
     setEditOpen(false);
   };
 
-  if (!profile) return <div className="py-12 text-center text-gray-400">Loading...</div>;
+  if (!profile)
+    return (
+      <div className="py-16 flex justify-center items-center text-gray-500">
+        Loading...
+      </div>
+    );
 
-  // Fallback for profile image
-  const fallbackImage = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=128&h=128&fit=facearea";
+  const fallbackImage =
+    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=128&h=128&fit=facearea";
 
   return (
-    <div className="max-w-xl mx-auto mt-8 bg-white shadow rounded-xl p-6">
-      <div className="flex gap-4 items-center">
+    <div className="bg-white shadow-lg rounded-2xl p-8 relative w-full">
+      {pageView && onClose && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="absolute left-2 top-2"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </Button>
+      )}
+      <div className="flex flex-col md:flex-row gap-10 items-center md:items-start mb-8">
         <img
           src={profile.profile_image || fallbackImage}
           alt={profile.name}
-          className="w-20 h-20 rounded-full border object-cover"
+          className="w-32 h-32 rounded-full object-cover border-4 border-primary"
         />
-        <div>
-          <div className="text-2xl font-bold">{profile.name}</div>
-          <div className="text-gray-500">{profile.main_field}</div>
+        <div className="flex-1 w-full">
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-extrabold text-gray-800">
+              {profile.name}
+            </h1>
+            <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs font-semibold uppercase">
+              {profile.main_field || "No Field"}
+            </span>
+          </div>
+          <div className="mt-2 text-gray-500">{profile.bio || "—"}</div>
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div><span className="font-semibold text-gray-800">Phone:</span> {profile.phone || "—"}</div>
+            <div><span className="font-semibold text-gray-800">Country:</span> {profile.country || "—"}</div>
+            <div><span className="font-semibold text-gray-800">City:</span> {profile.city || "—"}</div>
+            <div><span className="font-semibold text-gray-800">Nationality:</span> {profile.nationality || "—"}</div>
+          </div>
         </div>
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="ml-auto bg-gray-100 p-2 rounded hover:bg-gray-200"
-            aria-label="Close profile modal"
-          >×</button>
-        )}
       </div>
-      <div className="my-5">
-        <div className="text-gray-700"><strong>Bio:</strong> {profile.bio || "-"}</div>
-        <div className="text-gray-700"><strong>Phone:</strong> {profile.phone || "-"}</div>
-        <div className="text-gray-700"><strong>Country:</strong> {profile.country || "-"}</div>
-        <div className="text-gray-700"><strong>City:</strong> {profile.city || "-"}</div>
-        <div className="text-gray-700"><strong>Nationality:</strong> {profile.nationality || "-"}</div>
+      <div className="flex flex-row-reverse">
+        <Button onClick={() => setEditOpen(true)}>Edit Profile</Button>
       </div>
-      <Button onClick={() => setEditOpen(true)}>Edit Profile</Button>
-      <Modal open={editOpen} onClose={() => setEditOpen(false)}>
-        <h2 className="font-bold text-xl mb-3">Edit Profile</h2>
-        <EditProfileForm profile={profile} onSubmit={handleUpdate} onCancel={() => setEditOpen(false)} />
-      </Modal>
+      {editOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-lg p-8 max-w-lg w-full relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setEditOpen(false)}
+              className="absolute right-2 top-2"
+              aria-label="Close edit"
+            >
+              ×
+            </Button>
+            <h2 className="font-bold text-xl mb-3">Edit Profile</h2>
+            <EditProfileForm
+              profile={profile}
+              onSubmit={handleUpdate}
+              onCancel={() => setEditOpen(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

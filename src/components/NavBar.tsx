@@ -1,4 +1,3 @@
-
 import { Home, Users, Briefcase, MessageSquare, LogIn, UserRound } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { Link, useLocation } from "react-router-dom";
@@ -27,31 +26,23 @@ export default function NavBar() {
   // Show loading state for auth
   if (loading) return null;
 
-  // Profile button (avatar or default) if logged in
   let profileButton = null;
 
   if (user) {
-    // Use Supabase user id to fetch the user's profile info for image
-    // We'll use the default dicebear image if necessary, since not all info is immediately available
-    const defaultPic = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=128&h=128&fit=facearea";
-    // We'll let <UserProfile> re-fetch, so for now just use session data
+    const defaultPic =
+      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=128&h=128&fit=facearea";
     profileButton = (
-      <>
-        <button
-          className="rounded-full w-10 h-10 bg-gray-100 border hover:shadow transition overflow-hidden focus:ring-2 focus:ring-primary focus:outline-none"
-          onClick={() => setProfileOpen(true)}
-          aria-label="Open profile"
-        >
-          <img
-            src={defaultPic}
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
-        </button>
-        <Modal open={profileOpen} onClose={() => setProfileOpen(false)}>
-          <UserProfile onClose={() => setProfileOpen(false)} />
-        </Modal>
-      </>
+      <Link
+        to="/profile"
+        className="rounded-full w-10 h-10 bg-gray-100 border hover:shadow transition overflow-hidden focus:ring-2 focus:ring-primary focus:outline-none"
+        aria-label="Profile"
+      >
+        <img
+          src={defaultPic}
+          alt="Profile"
+          className="w-full h-full object-cover"
+        />
+      </Link>
     );
   }
 
@@ -65,12 +56,16 @@ export default function NavBar() {
         <ul className="flex items-center gap-2 ml-4">
           {pages.map((page) => {
             const Icon = page.icon;
-            const active = location.pathname === page.path || (page.path === "/" && location.pathname === "/");
+            const active =
+              location.pathname === page.path ||
+              (page.path === "/" && location.pathname === "/");
             return (
               <li key={page.name}>
                 <Link
                   to={page.path}
-                  className={`flex items-center gap-1 font-semibold px-3 py-1.5 text-primary rounded-md hover:bg-primary hover:text-white transition ${active ? "bg-primary text-white" : ""}`}
+                  className={`flex items-center gap-1 font-semibold px-3 py-1.5 text-primary rounded-md hover:bg-primary hover:text-white transition ${
+                    active ? "bg-primary text-white" : ""
+                  }`}
                 >
                   <Icon size={18} />
                   <span className="hidden sm:inline">{t(page.name)}</span>
@@ -87,7 +82,9 @@ export default function NavBar() {
               className="text-primary border border-primary px-4 py-1.5 rounded-lg flex items-center gap-2 hover:bg-primary hover:text-white transition"
             >
               <LogIn size={18} />
-              <span className="font-semibold text-sm hidden sm:inline">{t("login_signup")}</span>
+              <span className="font-semibold text-sm hidden sm:inline">
+                {t("login_signup")}
+              </span>
             </Link>
           )}
           {user && profileButton}
