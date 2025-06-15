@@ -1,6 +1,7 @@
 
 import { LogIn, User, Users, Briefcase, Star } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { Link } from "react-router-dom";
 
 const roles = [
   { name: "Visitor", icon: User },
@@ -42,13 +43,13 @@ export default function NavBar({
         </ul>
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
-          <a
-            href="#login"
+          <Link
+            to="/auth"
             className="text-primary border border-primary px-4 py-1.5 rounded-lg flex items-center gap-2 hover:bg-primary hover:text-white transition"
           >
             <LogIn size={18} />
             <span className="font-semibold text-sm hidden sm:inline">Login / Signup</span>
-          </a>
+          </Link>
         </div>
       </nav>
     </header>
