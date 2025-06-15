@@ -1,5 +1,5 @@
-
 import { Briefcase, MapPin } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const jobs = [
   {
@@ -30,9 +30,11 @@ const jobs = [
 ];
 
 export default function FeaturedJobs() {
+  const { t } = useTranslation();
+
   return (
     <section className="container py-10">
-      <h2 className="text-2xl font-bold mb-4 text-primary">Hot Job Opportunities</h2>
+      <h2 className="text-2xl font-bold mb-4 text-primary">{t("hot_jobs")}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {jobs.map((job, idx) => (
           <div
@@ -47,7 +49,7 @@ export default function FeaturedJobs() {
             <div className="flex items-center text-xs gap-2 mt-1 mb-2">
               <MapPin className="text-gray-400" size={16} />
               {job.location}
-              <span className="ml-2 rounded bg-blue-50 text-blue-700 px-2 py-0.5">{job.type}</span>
+              <span className="ml-2 rounded bg-blue-50 text-blue-700 px-2 py-0.5">{t(job.type.toLowerCase())}</span>
             </div>
             <div className="flex gap-1 flex-wrap">
               {job.tags.map(tag => (
@@ -59,7 +61,7 @@ export default function FeaturedJobs() {
               href="#apply"
               className="mt-2 w-full text-center bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 font-semibold transition"
             >
-              Apply
+              {t("apply")}
             </a>
           </div>
         ))}

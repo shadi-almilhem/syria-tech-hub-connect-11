@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,11 +14,11 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  // New sign up fields
   const [name, setName] = useState("");
   const [country, setCountry] = useState("");
   const [bio, setBio] = useState("");
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -96,43 +97,45 @@ export default function AuthPage() {
       <button
         onClick={() => navigate("/")}
         className="absolute left-4 top-4 flex items-center gap-2 text-gray-600 hover:text-primary px-3 py-2 rounded transition bg-white/80"
-        aria-label="Back to Home"
+        aria-label={t("back_home")}
         type="button"
       >
         <ArrowLeft size={20} />
-        <span className="hidden sm:inline font-medium">Back</span>
+        <span className="hidden sm:inline font-medium">{t("back")}</span>
       </button>
       <div className="max-w-md w-full bg-white rounded-xl shadow-md p-8 border flex flex-col gap-6">
         <h1 className="text-2xl font-bold text-primary mb-2 text-center">
-          {isLogin ? "Login" : "Sign up"}
+          {isLogin ? t("login") : t("signup")}
         </h1>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           {!isLogin && (
             <>
               <div>
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t("name")}</Label>
                 <Input
                   id="name"
                   required
-                  placeholder="Your full name"
+                  placeholder={t("your_full_name")}
                   value={name}
                   onChange={e => setName(e.target.value)}
                   />
               </div>
               <div>
-                <Label htmlFor="country">Country</Label>
+                <Label htmlFor="country">{t("country")}</Label>
                 <Input
                   id="country"
-                  placeholder="Country"
+                  placeholder={t("country")}
                   value={country}
                   onChange={e => setCountry(e.target.value)}
                   />
               </div>
               <div>
-                <Label htmlFor="bio">Bio <span className="text-xs text-muted-foreground">(max 200 chars)</span></Label>
+                <Label htmlFor="bio">
+                  {t("bio")} <span className="text-xs text-muted-foreground">{t("max_chars", { count: 200 })}</span>
+                </Label>
                 <Textarea
                   id="bio"
-                  placeholder="Tell us about yourself"
+                  placeholder={t("about_you")}
                   maxLength={200}
                   value={bio}
                   onChange={e => setBio(e.target.value)}
@@ -141,12 +144,12 @@ export default function AuthPage() {
             </>
           )}
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               type="email"
               required
-              placeholder="Email"
+              placeholder={t("email")}
               className="px-4 py-2 border rounded"
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -154,12 +157,12 @@ export default function AuthPage() {
             />
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <Input
               id="password"
               type="password"
               required
-              placeholder="Password"
+              placeholder={t("password")}
               className="px-4 py-2 border rounded"
               value={password}
               onChange={e => setPassword(e.target.value)}
@@ -170,7 +173,7 @@ export default function AuthPage() {
             <div className="text-red-600 text-sm rounded bg-red-50 p-2">{errorMsg}</div>
           )}
           <Button type="submit" disabled={loading} className="mt-2">
-            {loading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
+            {loading ? t("please_wait") : isLogin ? t("login") : t("create_account")}
           </Button>
         </form>
         <button
@@ -181,8 +184,8 @@ export default function AuthPage() {
           }}
         >
           {isLogin
-            ? "Don't have an account? Sign up"
-            : "Already have an account? Log in"}
+            ? t("dont_have_account")
+            : t("already_have_account")}
         </button>
       </div>
     </div>

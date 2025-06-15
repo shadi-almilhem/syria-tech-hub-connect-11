@@ -1,10 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Building, MapPin, Search } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 type CompanyProfile = {
   id: string;
@@ -17,6 +17,7 @@ type CompanyProfile = {
 };
 
 export default function CompaniesPage() {
+  const { t, i18n } = useTranslation();
   const [companies, setCompanies] = useState<CompanyProfile[]>([]);
   const [search, setSearch] = useState("");
   const [filtered, setFiltered] = useState<CompanyProfile[]>([]);
@@ -59,11 +60,11 @@ export default function CompaniesPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="container max-w-6xl mx-auto py-8 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-primary text-center">Company Directory</h1>
+    <div className="container max-w-6xl mx-auto py-8 min-h-screen" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
+      <h1 className="text-3xl font-bold mb-6 text-primary text-center">{t("company_directory")}</h1>
       <div className="flex items-center gap-4 mb-8">
         <Input
-          placeholder="Search companies by name, bio or location..."
+          placeholder={t("search_companies")}
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full md:w-1/2"
@@ -71,7 +72,7 @@ export default function CompaniesPage() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.length === 0 && (
-          <p className="col-span-full text-center text-gray-500">No companies found.</p>
+          <p className="col-span-full text-center text-gray-500">{t("no_companies_found")}</p>
         )}
         {filtered.map(company => (
           <Card
@@ -109,7 +110,7 @@ export default function CompaniesPage() {
                 {company.bio || "-"}
               </div>
               <div className="text-xs text-primary-700 font-semibold">
-                {company.jobCount} job{company.jobCount === 1 ? "" : "s"} posted
+                {company.jobCount} {t("job", { count: company.jobCount })}
               </div>
             </CardContent>
           </Card>

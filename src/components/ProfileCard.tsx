@@ -1,5 +1,6 @@
 
 import { Star, MapPin } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export type Profile = {
   avatarUrl?: string;
@@ -16,6 +17,7 @@ export default function ProfileCard({
 }: {
   profile: Profile;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-white rounded-xl border shadow hover:shadow-lg transition p-6 flex flex-col gap-3 w-full max-w-xs mx-auto">
       <div className="flex items-center gap-4">
@@ -56,7 +58,7 @@ export default function ProfileCard({
         href="#view-profile"
         className="block mt-2 text-center border border-primary text-primary px-4 py-1.5 rounded hover:bg-primary hover:text-white font-semibold transition"
       >
-        View Profile
+        {t("view_profile")}
       </a>
     </div>
   );
