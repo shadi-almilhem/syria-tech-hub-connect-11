@@ -1,4 +1,7 @@
+
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +26,7 @@ export default function TraineesPage() {
   const [filterSkill, setFilterSkill] = useState("");
   const [filterCity, setFilterCity] = useState("");
   const [filterCountry, setFilterCountry] = useState("");
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     async function fetchTrainees() {
@@ -46,7 +50,6 @@ export default function TraineesPage() {
           (row.main_field ? [row.main_field] : []),
       }));
       setTrainees(traineesWithSkills);
-
       // Gather unique skill list
       const s = new Set<string>();
       traineesWithSkills.forEach((t) =>
@@ -88,12 +91,17 @@ export default function TraineesPage() {
     setFiltered(list);
   }, [search, filterSkill, filterCity, filterCountry, trainees]);
 
+  // Ensure RTL for Arabic
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === "ar" ? "rtl" : "ltr";
+  }, [i18n.language]);
+
   return (
-    <div className="container max-w-6xl mx-auto py-8 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-primary text-center">Trainee Directory</h1>
+    <div className="container max-w-6xl mx-auto py-8 min-h-screen" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
+      <h1 className="text-3xl font-bold mb-6 text-primary text-center">{t("trainees_header")}</h1>
       <div className="flex flex-col gap-3 md:flex-row md:gap-6 items-center mb-8">
         <Input
-          placeholder="Search trainees by name, skill, or keyword..."
+          placeholder={t("search_placeholder")}
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full md:w-2/5"
@@ -103,7 +111,7 @@ export default function TraineesPage() {
           onChange={e => setFilterSkill(e.target.value)}
           className="w-full md:w-1/5 border rounded px-3 py-2"
         >
-          <option value="">All Skills</option>
+          <option value="">{t("all_skills")}</option>
           {skillsList.map(skill => (
             <option key={skill} value={skill}>
               {skill}
@@ -111,13 +119,13 @@ export default function TraineesPage() {
           ))}
         </select>
         <Input
-          placeholder="Filter by city"
+          placeholder={t("city_filter")}
           value={filterCity}
           onChange={e => setFilterCity(e.target.value)}
           className="w-full md:w-1/5"
         />
         <Input
-          placeholder="Filter by country"
+          placeholder={t("country_filter")}
           value={filterCountry}
           onChange={e => setFilterCountry(e.target.value)}
           className="w-full md:w-1/5"
@@ -125,7 +133,7 @@ export default function TraineesPage() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.length === 0 && (
-          <p className="col-span-full text-center text-gray-500">No trainees found.</p>
+          <p className="col-span-full text-center text-gray-500">{t("no_trainees_found")}</p>
         )}
         {filtered.map(profile => (
           <Card key={profile.id} className="p-0 animate-fade-in hover:shadow-lg transition">
@@ -168,7 +176,7 @@ export default function TraineesPage() {
                 {profile.bio || "-"}
               </div>
               <div className="text-xs text-blue-700 font-semibold">
-                {profile.availability || "Available for collaboration"}
+                {profile.availability || t("available_collab")}
               </div>
             </CardContent>
           </Card>
