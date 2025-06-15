@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +12,7 @@ const ROLES = [
   { value: "trainee", label: "Trainee" },
   { value: "expert", label: "Expert" },
   { value: "company", label: "Company" },
+  { value: "admin", label: "Admin" }, // Added admin to match TS type
 ];
 
 export default function AuthPage() {
@@ -24,7 +24,7 @@ export default function AuthPage() {
   const [name, setName] = useState("");
   const [country, setCountry] = useState("");
   const [bio, setBio] = useState("");
-  const [role, setRole] = useState("trainee");
+  const [role, setRole] = useState<"trainee" | "expert" | "company" | "admin">("trainee");
   const navigate = useNavigate();
   const { t } = useTranslation();
 
