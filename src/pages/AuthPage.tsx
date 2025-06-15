@@ -170,7 +170,11 @@ export default function AuthPage() {
                   id="role"
                   required
                   value={role}
-                  onChange={e => setRole(e.target.value)}
+                  onChange={e =>
+                    setRole(
+                      e.target.value as "trainee" | "expert" | "company" | "admin"
+                    )
+                  }
                   className="w-full border rounded px-3 py-2"
                 >
                   {ROLES.map(r => (
