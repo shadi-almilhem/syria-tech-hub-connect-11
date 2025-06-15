@@ -43,7 +43,7 @@ export default function EditProfileForm({ profile, onSubmit, onCancel }: Props) 
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Profile updated!", description: "Your profile changes were saved.", variant: "success" });
+      toast({ title: "Profile updated!", description: "Your profile changes were saved.", variant: "default" });
       onSubmit(data);
     }
   };
