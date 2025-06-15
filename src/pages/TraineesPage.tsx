@@ -1,61 +1,55 @@
 
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import "@/i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { User, MapPin, Search, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 type TraineeProfile = {
   id: string;
   name: string;
-  skills_learning: string[];
   profile_image: string | null;
-  city: string | null;
   country: string | null;
+  city: string | null;
   bio: string | null;
-  availability?: string;
 };
 
 export default function TraineesPage() {
+  const { t, i18n } = useTranslation();
   const [trainees, setTrainees] = useState<TraineeProfile[]>([]);
   const [search, setSearch] = useState("");
   const [filtered, setFiltered] = useState<TraineeProfile[]>([]);
-  const [skillsList, setSkillsList] = useState<string[]>([]);
-  const [filterSkill, setFilterSkill] = useState("");
-  const [filterCity, setFilterCity] = useState("");
-  const [filterCountry, setFilterCountry] = useState("");
-  const { t, i18n } = useTranslation();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+
+  // Fetch current user profile to determine role
+  useEffect(() => {
+    async function fetchRole() {
+      setIsAdmin(false);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", session.user.id)
+        .maybeSingle();
+      if (data && data.role === "admin") setIsAdmin(true);
+    }
+    fetchRole();
+  }, []);
 
   useEffect(() => {
     async function fetchTrainees() {
-      // TEMP: remove role filter for debugging
       const { data, error } = await supabase
         .from("profiles")
-        .select(
-          "id,name,main_field,profile_image,city,country,bio,social_profile,role"
-        );
-      console.log("Supabase: fetched ALL profiles for debug", { data, error });
-      if (!data || error) {
-        setTrainees([]);
-        return;
-      }
-      // Extract skills_learning from social_profile
-      const traineesWithSkills: TraineeProfile[] = data.map((row: any) => ({
-        ...row,
-        skills_learning:
-          row.social_profile?.skills_learning ||
-          row.social_profile?.skills ||
-          (row.main_field ? [row.main_field] : []),
-      }));
-      setTrainees(traineesWithSkills);
-      // Gather unique skill list
-      const s = new Set<string>();
-      traineesWithSkills.forEach((t) =>
-        t.skills_learning.forEach((s1) => s.add(s1))
-      );
-      setSkillsList([...s]);
+        .select("id, name, profile_image, city, country, bio, role")
+        .eq("role", "trainee");
+      if (!data || error) return setTrainees([]);
+      setTrainees(data);
     }
     fetchTrainees();
   }, []);
@@ -67,117 +61,97 @@ export default function TraineesPage() {
       list = list.filter(
         t =>
           t.name.toLowerCase().includes(kw) ||
-          t.skills_learning.some(skill => skill.toLowerCase().includes(kw)) ||
-          (t.bio?.toLowerCase().includes(kw))
-      );
-    }
-    if (filterSkill) {
-      list = list.filter(t =>
-        t.skills_learning.some(skill =>
-          skill.toLowerCase().includes(filterSkill.toLowerCase())
-        )
-      );
-    }
-    if (filterCity) {
-      list = list.filter(t =>
-        (t.city || "").toLowerCase().includes(filterCity.toLowerCase())
-      );
-    }
-    if (filterCountry) {
-      list = list.filter(t =>
-        (t.country || "").toLowerCase().includes(filterCountry.toLowerCase())
+          (t.bio?.toLowerCase().includes(kw)) ||
+          (t.city?.toLowerCase().includes(kw)) ||
+          (t.country?.toLowerCase().includes(kw))
       );
     }
     setFiltered(list);
-  }, [search, filterSkill, filterCity, filterCountry, trainees]);
+  }, [search, trainees]);
 
-  // Ensure RTL for Arabic
-  useEffect(() => {
-    document.documentElement.dir = i18n.language === "ar" ? "rtl" : "ltr";
-  }, [i18n.language]);
+  async function handleDelete(id: string, name: string) {
+    if (!window.confirm(`Are you sure you want to delete ${name}'s account? This cannot be undone.`)) return;
+    setLoading(true);
+    const { error } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("id", id);
+    setLoading(false);
+    if (error) {
+      toast({
+        title: t("error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      setTrainees(prev => prev.filter(u => u.id !== id));
+      toast({
+        title: t("user_deleted"),
+        description: t("user_deleted_success", { name },
+        ),
+        variant: "default",
+      });
+    }
+  }
 
   return (
     <div className="container max-w-6xl mx-auto py-8 min-h-screen" dir={i18n.language === "ar" ? "rtl" : "ltr"}>
-      <h1 className="text-3xl font-bold mb-6 text-primary text-center">{t("trainees_header")}</h1>
-      <div className="flex flex-col gap-3 md:flex-row md:gap-6 items-center mb-8">
+      <h1 className="text-3xl font-bold mb-6 text-primary text-center">{t("trainee_directory")}</h1>
+      <div className="flex items-center gap-4 mb-8">
         <Input
-          placeholder={t("search_placeholder")}
+          placeholder={t("search_trainees")}
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full md:w-2/5"
-        />
-        <select
-          value={filterSkill}
-          onChange={e => setFilterSkill(e.target.value)}
-          className="w-full md:w-1/5 border rounded px-3 py-2"
-        >
-          <option value="">{t("all_skills")}</option>
-          {skillsList.map(skill => (
-            <option key={skill} value={skill}>
-              {skill}
-            </option>
-          ))}
-        </select>
-        <Input
-          placeholder={t("city_filter")}
-          value={filterCity}
-          onChange={e => setFilterCity(e.target.value)}
-          className="w-full md:w-1/5"
-        />
-        <Input
-          placeholder={t("country_filter")}
-          value={filterCountry}
-          onChange={e => setFilterCountry(e.target.value)}
-          className="w-full md:w-1/5"
+          className="w-full md:w-1/2"
         />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.length === 0 && (
           <p className="col-span-full text-center text-gray-500">{t("no_trainees_found")}</p>
         )}
-        {filtered.map(profile => (
-          <Card key={profile.id} className="p-0 animate-fade-in hover:shadow-lg transition">
-            <CardContent className="flex flex-col items-center p-6">
-              <img
-                src={
-                  profile.profile_image ||
-                  "https://api.dicebear.com/7.x/lorelei/svg?seed=" +
-                    encodeURIComponent(profile.name)
-                }
-                alt={profile.name}
-                className="rounded-full w-20 h-20 object-cover border mb-3"
-              />
-              <div className="text-lg font-semibold">{profile.name}</div>
+        {filtered.map(trainee => (
+          <Card key={trainee.id} className="p-0 hover:shadow-lg transition animate-fade-in">
+            <CardContent className="flex flex-col items-center p-6 relative">
+              {trainee.profile_image ? (
+                <img
+                  src={trainee.profile_image}
+                  alt={trainee.name}
+                  className="rounded-lg w-16 h-16 object-cover border mb-3"
+                />
+              ) : (
+                <User className="w-16 h-16 text-gray-400 mb-3" />
+              )}
+              <div className="text-lg font-bold">{trainee.name}</div>
               <div className="flex gap-1 text-xs text-gray-500 mb-1">
-                {profile.city && (
+                {trainee.city && (
                   <>
                     <MapPin size={14} />
-                    {profile.city}
+                    {trainee.city}
                   </>
                 )}
-                {profile.country && (
+                {trainee.country && (
                   <>
                     <span className="mx-1">/</span>
-                    {profile.country}
+                    {trainee.country}
                   </>
                 )}
               </div>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {profile.skills_learning.map(skill => (
-                  <span
-                    key={skill}
-                    className="bg-gray-100 px-2 py-0.5 rounded text-xs font-medium"
-                  >
-                    {skill}
-                  </span>
-                ))}
+              <div className="text-gray-700 text-sm text-center mb-2 line-clamp-2">
+                {trainee.bio || "-"}
               </div>
-              <div className="text-gray-700 text-sm mb-3 line-clamp-2 text-center">
-                {profile.bio || "-"}
-              </div>
-              <div className="text-xs text-blue-700 font-semibold">
-                {profile.availability || t("available_collab")}
-              </div>
+              {isAdmin && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  title="Delete trainee"
+                  disabled={loading}
+                  onClick={() => handleDelete(trainee.id, trainee.name)}
+                >
+                  <Trash2 className="mr-1 w-4 h-4" />
+                  {t("delete")}
+                </Button>
+              )}
             </CardContent>
           </Card>
         ))}
