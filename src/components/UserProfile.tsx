@@ -4,14 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import EditProfileForm from "./EditProfileForm";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LogOut } from "lucide-react";
 
 export default function UserProfile({
   onClose,
   pageView,
+  onLogout,
 }: {
   onClose?: () => void;
   pageView?: boolean;
+  onLogout?: () => void;
 }) {
   const [profile, setProfile] = useState<any>(null);
   const [editOpen, setEditOpen] = useState(false);
@@ -37,6 +39,7 @@ export default function UserProfile({
       }
     };
     getProfile();
+    // eslint-disable-next-line
   }, []);
 
   const handleUpdate = (updated: any) => {
@@ -91,8 +94,18 @@ export default function UserProfile({
           </div>
         </div>
       </div>
-      <div className="flex flex-row-reverse">
+      <div className="flex flex-row-reverse gap-2">
         <Button onClick={() => setEditOpen(true)}>Edit Profile</Button>
+        {onLogout && (
+          <Button
+            onClick={onLogout}
+            variant="outline"
+            className="flex items-center gap-1"
+          >
+            <LogOut className="w-4 h-4" />
+            Log Out
+          </Button>
+        )}
       </div>
       {editOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
