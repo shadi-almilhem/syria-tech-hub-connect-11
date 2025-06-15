@@ -1,4 +1,3 @@
-
 // Home Page for Syrian Tech Club
 
 import NavBar from "../components/NavBar";
@@ -13,7 +12,6 @@ export default function Index() {
   // Removed role, setRole since we no longer need them
   return (
     <div className="min-h-screen flex flex-col font-sans bg-background">
-      <NavBar />
       <main className="flex-grow w-full">
         <HeroSection />
         <FeaturedJobs />
