@@ -1,14 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+// Home Page for Syrian Tech Club
+
+import NavBar from "../components/NavBar";
+import HeroSection from "../components/HeroSection";
+import FeaturedJobs from "../components/FeaturedJobs";
+import FeaturedExperts from "../components/FeaturedExperts";
+import Footer from "../components/Footer";
+import { useState } from "react";
+
+// TEMP: simulate simple role logic, in prod connect to Supabase Auth + roles
+export default function Index() {
+  const [role, setRole] = useState("Visitor");
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen flex flex-col font-sans bg-background">
+      <NavBar currentRole={role} onRoleChange={setRole} />
+      <main className="flex-grow w-full">
+        <HeroSection />
+        <FeaturedJobs />
+        <FeaturedExperts />
+        {/* Future: Forum, Rating, Company panels, Community CTA, etc. */}
+      </main>
+      <Footer />
     </div>
   );
-};
-
-export default Index;
+}
