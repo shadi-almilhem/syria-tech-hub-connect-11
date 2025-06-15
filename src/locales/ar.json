@@ -1,4 +1,3 @@
-
 {
   "trainees_header": "دليل المتدربين",
   "search_placeholder": "ابحث عن متدرب بالاسم أو المهارة أو كلمة مفتاحية...",
@@ -6,5 +5,7 @@
   "city_filter": "تصفية حسب المدينة",
   "country_filter": "تصفية حسب الدولة",
   "no_trainees_found": "لم يتم العثور على متدربين.",
-  "available_collab": "متاح للتعاون"
+  "available_collab": "متاح للتعاون",
+  "jobs_header": "الوظائف",
+  "jobs_placeholder": "هذه مجرد صفحة للوظائف. قريباً سيتم إطلاق لوحة الوظائف!"
 }
