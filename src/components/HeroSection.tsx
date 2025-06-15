@@ -1,9 +1,11 @@
 
 import SearchBar from "./SearchBar";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   return (
     <section className="relative flex flex-col md:flex-row items-center justify-between gap-6 py-16 sm:py-24 md:py-32 container">
@@ -15,18 +17,20 @@ export default function HeroSection() {
           {t("hero_subtitle")}
         </p>
         <div className="flex flex-col gap-2 md:flex-row md:gap-4">
-          <a
-            href="#signup"
+          <button
             className="bg-primary text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-primary/90 text-base transition"
+            onClick={() => navigate("/auth")}
+            type="button"
           >
             {t("join_expert_trainee")}
-          </a>
-          <a
-            href="#post-job"
+          </button>
+          <button
             className="px-6 py-3 rounded-lg border border-primary text-primary font-semibold text-base hover:bg-primary/10 transition"
+            onClick={() => navigate("/jobs")}
+            type="button"
           >
             {t("post_job")}
-          </a>
+          </button>
         </div>
       </div>
       <div className="flex-1 flex flex-col items-center w-full max-w-lg animate-fade-in">
