@@ -1,5 +1,5 @@
 
-import { Home, Users, Briefcase, MessageSquare } from "lucide-react";
+import { Home, Users, Briefcase, MessageSquare, LogIn } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { Link, useLocation } from "react-router-dom";
 
