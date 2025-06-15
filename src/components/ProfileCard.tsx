@@ -14,8 +14,10 @@ export type Profile = {
 
 export default function ProfileCard({
   profile,
+  onViewProfile
 }: {
   profile: Profile;
+  onViewProfile?: () => void;
 }) {
   const { t } = useTranslation();
   return (
@@ -54,12 +56,12 @@ export default function ProfileCard({
         <span className="font-semibold">{(profile.rating ?? 5).toFixed(1)}</span>
         <span className="text-xs text-gray-400">/ 5</span>
       </div>
-      <a
-        href="#view-profile"
+      <button
         className="block mt-2 text-center border border-primary text-primary px-4 py-1.5 rounded hover:bg-primary hover:text-white font-semibold transition"
+        onClick={onViewProfile}
       >
         {t("view_profile")}
-      </a>
+      </button>
     </div>
   );
 }

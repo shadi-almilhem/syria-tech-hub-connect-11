@@ -1,5 +1,7 @@
 import { Briefcase, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import Modal from "./Modal";
+import { useState } from "react";
 
 const jobs = [
   {
@@ -29,8 +31,60 @@ const jobs = [
   // ...more jobs
 ];
 
+function JobApplicationForm({ jobTitle, onClose }: { jobTitle: string; onClose: () => void }) {
+  const { t } = useTranslation();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  return (
+    <div>
+      <h3 className="text-xl font-bold mb-2">{t("apply")} – {jobTitle}</h3>
+      {submitted ? (
+        <div className="text-green-600">{t("please_wait")}</div>
+      ) : (
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            setSubmitted(true);
+            setTimeout(() => {
+              setSubmitted(false);
+              onClose();
+            }, 1200);
+          }}
+          className="flex flex-col gap-3"
+        >
+          <input
+            className="border rounded px-3 py-2"
+            placeholder={t("your_full_name")}
+            required
+            value={name}
+            onChange={e => setName(e.target.value)}
+          />
+          <input
+            className="border rounded px-3 py-2"
+            type="email"
+            placeholder={t("email")}
+            required
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="bg-primary text-white rounded px-4 py-2 font-semibold mt-1 disabled:opacity-50"
+            disabled={submitted}
+          >
+            {t("apply")}
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function FeaturedJobs() {
   const { t } = useTranslation();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<{ title: string } | null>(null);
 
   return (
     <section className="container py-10">
@@ -57,15 +111,26 @@ export default function FeaturedJobs() {
               ))}
             </div>
             <span className="text-xs text-gray-400 mt-auto">{job.posted}</span>
-            <a
-              href="#apply"
+            <button
               className="mt-2 w-full text-center bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 font-semibold transition"
+              onClick={() => {
+                setSelectedJob(job);
+                setModalOpen(true);
+              }}
             >
               {t("apply")}
-            </a>
+            </button>
           </div>
         ))}
       </div>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        {selectedJob && (
+          <JobApplicationForm
+            jobTitle={selectedJob.title}
+            onClose={() => setModalOpen(false)}
+          />
+        )}
+      </Modal>
     </section>
   );
 }
