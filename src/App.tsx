@@ -10,6 +10,8 @@ import NotFound from "./pages/NotFound";
 import ExpertsPage from "./pages/ExpertsPage";
 import TraineesPage from "./pages/TraineesPage";
 import CompaniesPage from "./pages/CompaniesPage";
+import JobsPage from "./pages/JobsPage";
+import ForumPage from "./pages/ForumPage";
 import { supabase } from "@/integrations/supabase/client";
 
 // Helper component to protect routes that require authentication
@@ -65,6 +67,8 @@ const App = () => (
           <Route path="/experts" element={<ExpertsPage />} />
           <Route path="/trainees" element={<TraineesPage />} />
           <Route path="/companies" element={<CompaniesPage />} />
+          <Route path="/jobs" element={<JobsPage />} />
+          <Route path="/forum" element={<ForumPage />} />
           {/* Future: Protect private routes with PrivateRoute if needed */}
           <Route path="*" element={<NotFound />} />
         </Routes>
