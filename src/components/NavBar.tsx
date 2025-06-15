@@ -1,9 +1,13 @@
 
-import { Home, Users, Briefcase, MessageSquare, LogIn } from "lucide-react";
+import { Home, Users, Briefcase, MessageSquare, LogIn, UserRound } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "@/i18n";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { useState } from "react";
+import Modal from "./Modal";
+import UserProfile from "./UserProfile";
 
 const pages = [
   { name: "nav_home", path: "/", icon: Home },
@@ -17,6 +21,39 @@ const pages = [
 export default function NavBar() {
   const location = useLocation();
   const { t } = useTranslation();
+  const { user, session, loading } = useAuthUser();
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  // Show loading state for auth
+  if (loading) return null;
+
+  // Profile button (avatar or default) if logged in
+  let profileButton = null;
+
+  if (user) {
+    // Use Supabase user id to fetch the user's profile info for image
+    // We'll use the default dicebear image if necessary, since not all info is immediately available
+    const defaultPic = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=128&h=128&fit=facearea";
+    // We'll let <UserProfile> re-fetch, so for now just use session data
+    profileButton = (
+      <>
+        <button
+          className="rounded-full w-10 h-10 bg-gray-100 border hover:shadow transition overflow-hidden focus:ring-2 focus:ring-primary focus:outline-none"
+          onClick={() => setProfileOpen(true)}
+          aria-label="Open profile"
+        >
+          <img
+            src={defaultPic}
+            alt="Profile"
+            className="w-full h-full object-cover"
+          />
+        </button>
+        <Modal open={profileOpen} onClose={() => setProfileOpen(false)}>
+          <UserProfile onClose={() => setProfileOpen(false)} />
+        </Modal>
+      </>
+    );
+  }
 
   return (
     <header className="w-full bg-white/90 backdrop-blur-sm shadow-sm sticky top-0 z-40 border-b border-gray-100">
@@ -44,13 +81,16 @@ export default function NavBar() {
         </ul>
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
-          <Link
-            to="/auth"
-            className="text-primary border border-primary px-4 py-1.5 rounded-lg flex items-center gap-2 hover:bg-primary hover:text-white transition"
-          >
-            <LogIn size={18} />
-            <span className="font-semibold text-sm hidden sm:inline">{t("login_signup")}</span>
-          </Link>
+          {!user && (
+            <Link
+              to="/auth"
+              className="text-primary border border-primary px-4 py-1.5 rounded-lg flex items-center gap-2 hover:bg-primary hover:text-white transition"
+            >
+              <LogIn size={18} />
+              <span className="font-semibold text-sm hidden sm:inline">{t("login_signup")}</span>
+            </Link>
+          )}
+          {user && profileButton}
         </div>
       </nav>
     </header>
